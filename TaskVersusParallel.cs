@@ -5,74 +5,59 @@ using BenchmarkDotNet.Running;
 BenchmarkSwitcher switcher = new(Assembly.GetExecutingAssembly());
 switcher.Run(args);
 
-[ShortRunJob]
-public class BenchmarkSimulatedIo
-{
-    [Params(1, 10, 100)]
-    public int CollectionCount;
+[Benchmark]
+    public async Task TaskWhenAllFix()
+    {
+        var tasks = _dataSet.Select(_ =>
+        Task.Run(() =>
+        {
+            for (var i = 0; i < CpuWorkIterations; i++)
+            {
+                Random.Shared.Next();
+            }
 
-    [Params(1, 10, 100, 1000)]
-    public int SimulatedIoDelays;
+            return Task.CompletedTask;
+        })).ToArray();
+
+        await Task.WhenAll(tasks);
+    }
 
     [Benchmark]
-    public async Task TaskWhenAll()
+    public async Task TaskWhenAllFixOptPrefer()
     {
-        var tasks = Enumerable
-            .Range(0, CollectionCount)
-            .Select(async _ => await Task.Delay(SimulatedIoDelays))
+        var tasks = _dataSet
+            .Select(_ =>
+                Task.Factory.StartNew(
+                (obj) =>
+                {
+                    for (var i = 0; i < CpuWorkIterations; i++)
+                    {
+                        Random.Shared.Next();
+                    }
+                },
+                CancellationToken.None,
+                TaskCreationOptions.PreferFairness))
             .ToArray();
 
         await Task.WhenAll(tasks);
     }
 
     [Benchmark]
-    public async Task ParallelForEach() =>
-        await Parallel.ForEachAsync(
-            Enumerable.Range(0, CollectionCount),
-            cancellationToken: default,
-            async (i, ct) => await Task.Delay(SimulatedIoDelays, ct));
-}
-
-[ShortRunJob]
-public class BenchmarkSimulatedCpu
-{
-    private int[]? _dataSet;
-    
-    [Params(1, 10, 100)]
-    public int CollectionCount;
-
-    [Params(1000, 10_000, 100_000, 1_000_000)]
-    public int CpuWorkIterations;
-
-    [GlobalSetup]
-    public void GlobalSetup() =>
-        _dataSet = Enumerable.Range(0, CollectionCount).ToArray();
-
-    [Benchmark]
-    public async Task TaskWhenAll()
+    public async Task TaskWhenAllFixOptPreferLong()
     {
-        var tasks = _dataSet!.Select(_ =>
-        {
-            for (var i = 0; i < CpuWorkIterations; i++)
-            {
-                Random.Shared.Next();
-            }
-            return Task.CompletedTask;
-        }).ToArray();
+        var tasks = _dataSet
+            .Select(_ =>
+                Task.Factory.StartNew(
+                (obj) =>
+                {
+                    for (var i = 0; i < CpuWorkIterations; i++)
+                    {
+                        Random.Shared.Next();
+                    }
+                },
+                CancellationToken.None,
+                TaskCreationOptions.PreferFairness | TaskCreationOptions.LongRunning))
+            .ToArray();
 
         await Task.WhenAll(tasks);
     }
-
-    [Benchmark]
-    public async Task ParallelForEach() =>
-        await Parallel.ForEachAsync(
-            _dataSet!,
-            cancellationToken: default,
-            (_, ct) =>
-            {
-                for (var i = 0; i < CpuWorkIterations; i++)
-                {
-                    Random.Shared.Next();
-                }
-                return ValueTask.CompletedTask;
-            });
