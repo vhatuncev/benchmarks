@@ -4,6 +4,7 @@ using BenchmarkDotNet.Running;
 //https://www.youtube.com/watch?v=GE-phyI6lEM
 //https://mjebrahimi.github.io/DotNet-Collections-Benchmark/Benchmark-SearchTryGetValue-Allocated.html
 //https://github.com/dotnet/performance/blob/main/src/benchmarks/micro/README.md#private-runtime-builds
+//https://stackoverflow.com/questions/67010378/how-to-populate-and-return-listt-from-parallel-foreach-using-partitioning
 BenchmarkSwitcher switcher = new(Assembly.GetExecutingAssembly());
 switcher.Run(args);
 
