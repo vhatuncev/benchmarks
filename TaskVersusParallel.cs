@@ -1,7 +1,7 @@
 using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
-
+//https://www.youtube.com/watch?v=GE-phyI6lEM
 BenchmarkSwitcher switcher = new(Assembly.GetExecutingAssembly());
 switcher.Run(args);
 
