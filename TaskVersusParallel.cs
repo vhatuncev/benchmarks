@@ -2,6 +2,7 @@ using System.Reflection;
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Running;
 //https://www.youtube.com/watch?v=GE-phyI6lEM
+//https://mjebrahimi.github.io/DotNet-Collections-Benchmark/Benchmark-SearchTryGetValue-Allocated.html
 BenchmarkSwitcher switcher = new(Assembly.GetExecutingAssembly());
 switcher.Run(args);
 
