@@ -6,6 +6,7 @@ using BenchmarkDotNet.Running;
 //https://github.com/dotnet/performance/blob/main/src/benchmarks/micro/README.md#private-runtime-builds
 //https://stackoverflow.com/questions/67010378/how-to-populate-and-return-listt-from-parallel-foreach-using-partitioning
 //https://habr.com/ru/articles/797777/
+//https://learn.microsoft.com/en-us/dotnet/csharp/advanced-topics/performance/ref-tutorial
 BenchmarkSwitcher switcher = new(Assembly.GetExecutingAssembly());
 switcher.Run(args);
 
